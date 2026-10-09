@@ -12,6 +12,18 @@
 #include "system.h"
 
 /* export LD_LIBRARY_PATH=. */
+#include <math.h>
+double sigmoid(double x)
+{
+	double z;
+
+	if (x <= 0.0) {
+		z = exp(-x);
+		return 1.0 / (1.0 + z);
+	}
+	z = exp(x);
+	return z/(1.0 + z);
+}
 
 static void
 reflect(const struct parser_dag *dag, FILE *file)
@@ -69,9 +81,10 @@ reflect(const struct parser_dag *dag, FILE *file)
 static void
 generate(const struct parser_dag *dag, FILE *file)
 {
+	fprintf(file, "extern double sigmoid(double);\n");
 	fprintf(file, "double evaluate(void) {\n");
 	reflect(dag, file);
-	fprintf(file, "return t%d;\n}\n", dag->id);
+	fprintf(file, "return sigmoid(t%d);\n}\n", dag->id);
 }
 
 typedef double (*evaluate_t)(void);
